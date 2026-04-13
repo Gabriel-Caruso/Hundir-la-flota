@@ -13,20 +13,22 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
     orientaciones = ["N", "S", "E", "O"]
 
     # comprobar parámetros de entrada
-    if barco.eslora > LADO:
+    if barco.eslora > tablero.lado:
         raise ValueError("El barco es demasiado grande para el tablero")
     elif orientacion not in orientaciones:
         raise ValueError("La orientación no es válida")
 
     else:
-        if orientacion in "NS": # Para los barcos Norte y Sur, se comprueban las condiciones verticales
+        if orientacion in "NS": # Para los barcos Norte y Sur, se comprueban las condiciones verticales (i)
             if orientacion == "N":
-                posicion_colocar = [posicion[0] - barco.eslora, posicion[1]]
+                posicion_colocar = [posicion[0] - barco.eslora + 1, posicion[1]]
                 # transformar el barco hacia el norte en uno hacia el sur
             else:
                 posicion_colocar = posicion    # el barco hacia el sur
-                
-            if (LADO - posicion_colocar[0] + 1) < barco.eslora or (posicion_colocar[1] not in range(LADO)):   # el barco tiene que caber desde su posición
+            
+            # el barco tiene que caber desde su posición  
+            if (len(tablero.tablero[posicion_colocar[0]:, posicion_colocar[1]]) < barco.eslora) or (posicion_colocar[1] not in range(tablero.lado)) or \
+                    (all(tablero.tablero[posicion_colocar[0]:, posicion_colocar[1]])):   
                 # +1 para compensar el 0 porque hablamos de longitud, no de índices
                 raise ValueError("El barco no cabe en esa posición")
             else:
@@ -37,14 +39,16 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
 
                 tablero.barcos.append(barco) # guardar el barco en el tablero
 
-        if orientacion in "EO": # Para los barcos Este y Oeste, se comprueban las condiciones horizontales    
+        if orientacion in "EO": # Para los barcos Este y Oeste, se comprueban las condiciones horizontales (j)
             if orientacion == "O":
-                posicion_colocar = [posicion[0], posicion[1] - barco.eslora]
+                posicion_colocar = [posicion[0], posicion[1] - barco.eslora + 1]
                 # transformar el barco hacia el norte en uno hacia el este
             else:
                 posicion_colocar = posicion    # el barco hacia el este
-                
-            if (LADO - posicion_colocar[1] + 1 < barco.eslora) or (posicion_colocar[0] not in range (LADO)):   # el barco tiene que caber desde su posición
+
+            # el barco tiene que caber desde su posición
+            if (len(tablero.tablero[posicion_colocar[0], posicion_colocar[1]:]) < barco.eslora) or (posicion_colocar[0] not in range (tablero.lado)) or \
+                  (all(tablero.tablero[posicion_colocar[0], posicion_colocar[1]:])):
                 # +1 para compensar el 0 porque hablamos de longitud, no de índices
                 raise ValueError("El barco no cabe en esa posición")
             else:
@@ -58,60 +62,50 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
     return tablero
 
 
-def imprimir_tablero(tablero : Tablero):
+def imprimir_tablero(tablero : Tablero, completo = False):
     mapa_tablero = tablero.tablero.copy() # para no modificar el tablero original
     for i in range(tablero.lado):
         for j in range(tablero.lado):
-            if tablero[i,j] != 0:
-                #if (i, j) in tablero.aguas:
-                #    mapa_tablero[i,j] = "~"     # HAY QUE AÑADIR EL ATRIBUTO AGUAS
-
-                if (i, j) in tablero[i,j].hits: # COORDENADAS SON TUPLAS
+            if (i, j) in tablero.aguas:
+                mapa_tablero[i,j] = "~"
+            elif tablero.tablero[i,j] != 0:
+                if (i, j) in tablero.tablero[i,j].hits: # COORDENADAS SON TUPLAS
                     mapa_tablero[i,j] = "X"
-                else:
+                elif completo:                  # sólo si queremos imprimir el trablero completo se añaden los abrcos sin tocar
                     mapa_tablero[i,j] = "O"
+                else:
+                    mapa_tablero[i,j] = 0       # La copia de tablero tendria el barco en esa posicion, hay que quitarla
     print(mapa_tablero)
     return      # return None porque solo es imprimir
 
 
-# también queremos poder imprimir el tablero solo con la información que tiene el oponente
-def ver_tablero_juego(tablero : Tablero):
-    mapa_tablero = tablero.tablero.copy() # para no modificar el tablero original
-    for i in range(tablero.lado):
-        for j in range(tablero.lado):
-            if tablero[i,j] != 0:
-                #if (i, j) in tablero.aguas:
-                #    mapa_tablero[i,j] = "~"     # HAY QUE AÑADIR EL ATRIBUTO AGUAS
-
-                if (i, j) in tablero[i,j].hits: # COORDENADAS SON TUPLAS
-                    mapa_tablero[i,j] = "X"
-    print(mapa_tablero)
-    return mapa_tablero # es util que lo devuelva para la máquina, pero no para imprimirlo para el jugador
-
-
 def disparo (tablero : Tablero, coordenada : tuple):
+    acertado = False
     if coordenada[0] not in range(tablero.lado) or coordenada[1] not in range(tablero.lado):
         raise ValueError("Coordenada fuera del tablero")
 
     elif len(coordenada) != 2:      # por si las dimensiones de la coordenada no son correctas
         raise ValueError("Coordenada no válida")
     else:
-        # if coordenada in tablero.aguas: # HAY QUE AÑADIR EL ATRIBUTO AGUAS
-        #     print("Ya has disparado a esa coordenada y no había nada")
-        # else:
-            if type(tablero[coordenada]) == Barco:
-                barco = tablero[coordenada]
+        if coordenada in tablero.aguas:
+             print("Ya has disparado a esa coordenada y no había nada")
+        else:
+            i, j = coordenada
+            if type(tablero.tablero[i, j]) == Barco:
+                acertado = True
+                barco = tablero.tablero[i,j]
                 barco.hit(coordenada)
                 if barco.is_dead():
                     print("Tocado y hundido. Has acabado con el barco " + barco.nombre)
                 else:
                     print("Tocado")
 
-            elif tablero[coordenada] == 0:
-                #tablero.aguas.append(coordenada) # HAY QUE AÑADIR EL ATRIBUTO AGUAS
+            elif tablero.tablero[i,j] == 0:
+                tablero.aguas.append(coordenada)
                 print("Agua")
+                
     
     if tablero.flota_hundida():
-        print("¡Has ganado! Has hundido toda la flota del enemigo" + tablero.id_jugador)
+        print("¡Has ganado! Has hundido toda la flota del enemigo: " + tablero.id_jugador)
 
-    return tablero
+    return acertado
