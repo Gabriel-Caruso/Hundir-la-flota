@@ -21,41 +21,42 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
     else:
         if orientacion in "NS": # Para los barcos Norte y Sur, se comprueban las condiciones verticales (i)
             if orientacion == "N":
-                posicion_colocar = [posicion[0] - barco.eslora + 1, posicion[1]]
+                posicion_colocar = (posicion[0] - barco.eslora + 1, posicion[1])
+                fila, columna = posicion_colocar        # para entender mejor el código
                 # transformar el barco hacia el norte en uno hacia el sur
             else:
                 posicion_colocar = posicion    # el barco hacia el sur
             
-            # el barco tiene que caber desde su posición  
-            if (len(tablero.tablero[posicion_colocar[0]:, posicion_colocar[1]]) < barco.eslora) or (posicion_colocar[1] not in range(tablero.lado)) or \
-                    (all(tablero.tablero[posicion_colocar[0]:, posicion_colocar[1]])):   
-                # +1 para compensar el 0 porque hablamos de longitud, no de índices
+            # el barco tiene que caber en el tablero desde su posición  
+            if (len(tablero.tablero[fila:, columna]) < barco.eslora) or (columna not in range(tablero.lado)) or \
+                    (any(tablero.tablero[fila : fila + barco.eslora, columna])):   # comprueba si hay un barco obstruyendo
                 raise ValueError("El barco no cabe en esa posición")
             else:
                 for i in range(barco.eslora):
                     # pongo el barco tal cual, pero se puede poner la id
-                    tablero.tablero[posicion_colocar[0] + i, posicion_colocar[1]] = barco
-                    barco.posiciones.append((posicion_colocar[0] + i, posicion_colocar[1]))
+                    tablero.tablero[fila + i, columna] = barco
+                    barco.posiciones.append((fila + i, columna))
 
                 tablero.barcos.append(barco) # guardar el barco en el tablero
 
+        # Hacemos igual para las orientaciones de este y oeste
         if orientacion in "EO": # Para los barcos Este y Oeste, se comprueban las condiciones horizontales (j)
             if orientacion == "O":
-                posicion_colocar = [posicion[0], posicion[1] - barco.eslora + 1]
+                posicion_colocar = (posicion[0], posicion[1] - barco.eslora + 1)
+                fila, columna = posicion_colocar        # para entender mejor el código
                 # transformar el barco hacia el norte en uno hacia el este
             else:
                 posicion_colocar = posicion    # el barco hacia el este
 
-            # el barco tiene que caber desde su posición
-            if (len(tablero.tablero[posicion_colocar[0], posicion_colocar[1]:]) < barco.eslora) or (posicion_colocar[0] not in range (tablero.lado)) or \
-                  (all(tablero.tablero[posicion_colocar[0], posicion_colocar[1]:])):
-                # +1 para compensar el 0 porque hablamos de longitud, no de índices
+            # el barco tiene que caber en el tablero desde su posición
+            if (len(tablero.tablero[fila, columna:]) < barco.eslora) or (fila not in range (tablero.lado)) or \
+                  (any(tablero.tablero[fila, columna:columna + barco.eslora])): # comprueba si hay un barco obstruyendo
                 raise ValueError("El barco no cabe en esa posición")
             else:
                 for i in range(barco.eslora):
                     # pongo el barco tal cual, pero se puede poner la id
-                    tablero.tablero[posicion_colocar[0], posicion_colocar[1] + i] = barco
-                    barco.posiciones.append((posicion_colocar[0], posicion_colocar[1] + i))
+                    tablero.tablero[fila, columna + i] = barco
+                    barco.posiciones.append((fila, columna + i))
 
                 tablero.barcos.append(barco) # guardar el barco en el tablero
 
