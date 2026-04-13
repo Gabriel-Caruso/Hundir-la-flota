@@ -21,18 +21,12 @@ class Barco:
 
 
 class Tablero:
-    def __init__(self, id_jugador):
+    def __init__(self, id_jugador, LADO):
         self.id_jugador = id_jugador
         self.lado = LADO # -> constante de variables.py || Lo de las mayúsculas es porque en Java se hace así con las constantes!
         self.barcos = []
         self.aguas = []
         self.tablero = np.zeros((self.lado, self.lado), dtype=object)
-
-        #Aquí se recorre la constante BARCOS con todos los barcos indicados en el ejercicio. Esto debería estar en variables.py
-        #Se almacena en la lista de self.barcos
-        for nombre, eslora in BARCOS:
-            barco = Barco(nombre, eslora)
-            self.barcos.append(barco)
 
     def colocar_barcos(self):
         #TODO: De esta función se encarga Ana
