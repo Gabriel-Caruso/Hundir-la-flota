@@ -6,7 +6,6 @@ Puedo hacer que colocar barco pille args para barcos, posiciones y orientaciones
 para crear el trablero de la máquina mas fácil.
 
 Por ahora, como los barcos del jugador se colocarán uno a uno, no hace falta.
-Ya lo añadiré luego.
 
 """
 def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientacion : str):
