@@ -25,7 +25,8 @@ class Tablero:
         self.id_jugador = id_jugador
         self.lado = LADO # -> constante de variables.py || Lo de las mayúsculas es porque en Java se hace así con las constantes!
         self.barcos = []
-        self.tablero = np.zeros((self.lado, self.lado))     #TODO: Comprobar si no hace falta meter un dtype=object para que nos deje pasar "X" y "~"
+        self.aguas = []
+        self.tablero = np.zeros((self.lado, self.lado), dtype=object)
 
         #Aquí se recorre la constante BARCOS con todos los barcos indicados en el ejercicio. Esto debería estar en variables.py
         #Se almacena en la lista de self.barcos
