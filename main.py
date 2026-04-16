@@ -2,7 +2,7 @@ import numpy as np
 import time
 from variables import LADO, BARCOS, ORIENTACIONES
 from clases import Barco, Tablero
-from funciones import imprimir_tablero, disparo, colocar_barco, traducir_coordenada
+from funciones import traducir_coordenada
 
 """
 El programa consiste, incialmente, de dos bucles for con whiles anidados para colocar los barcos,
@@ -14,8 +14,8 @@ Después, el bucle principal del juego es un buble while con anidaciones para lo
 print("Bienvenido a Hundir la Flota, ¿preparado para jugar?")
 nombre = input("Introduce tu nombre de jugador: ")
 
-tablero_jugador = Tablero(nombre, LADO)
-tablero_maquina= Tablero("Máquina", LADO)
+tablero_jugador = Tablero(nombre)
+tablero_maquina= Tablero("Máquina")
 
 # COLOCAR BARCOS DEL JUGADOR
 for info_barco in BARCOS:   # BARCOS es la colección de barcos 
@@ -28,7 +28,7 @@ for info_barco in BARCOS:   # BARCOS es la colección de barcos
         while not coordenada_valida:
             print(f"\nVamos a colocar el barco {info_barco[0]} de eslora {info_barco[1]}.")
             print("Este es el estado actual de tu tablero")
-            imprimir_tablero(tablero_jugador, completo=True)       # Imprimir el tablero completo del jugador para que vaya viendo todo
+            tablero_jugador.imprimir_tablero(completo=True)       # Imprimir el tablero completo del jugador para que vaya viendo todo
             orientacion_jugador = ((input("\nIntroduce una orientación en la que colocar el barco (N, S, E, O):")).upper()).strip()
             # Limpiar el input en caso de que sea minuscula o tenga espacios
             # Creo que decidir la orientación del barco antes que la posición es más intuitivo
@@ -44,7 +44,7 @@ for info_barco in BARCOS:   # BARCOS es la colección de barcos
 
         try:
             # Se coloca el barco donde se indica
-            colocar_barco(tablero_jugador, barco_jugador, coordenada_jugador, orientacion_jugador)
+            tablero_jugador.colocar_barco(barco_jugador, coordenada_jugador, orientacion_jugador)
             barco_colocado = True   # Si se coloca el barco pasamos al siguiente
         except Exception as error:
             print(str(error) + ", por favor vuelve a intertar colocar el barco.")
@@ -61,7 +61,7 @@ for info_barco in BARCOS:       # Todos los jugadores tienen los mismos barcos
         coordenada_maquina = (np.random.randint(LADO), np.random.randint(LADO))     # Maybe hace falta int()
         orientacion_maquina = ORIENTACIONES[int(np.random.randint(4))]          # Puede que la orientación elegida no quepa en el tablero, así que tiene que ir dentro
         try:
-            colocar_barco(tablero_maquina, barco_maquina, coordenada_maquina, orientacion_maquina)  # Intentamos colocar el barco
+            tablero_maquina.colocar_barco(barco_maquina, coordenada_maquina, orientacion_maquina)  # Intentamos colocar el barco
             barco_colocado = True
         except:
             pass    # Si no se puede colocar se vuelve a intentar, no queremos print del error para la maquina
@@ -79,7 +79,7 @@ while not tablero_maquina.flota_hundida() or tablero_jugador.flota_hundida():
 
         while not coordenada_valida:
             print ("Este es el tablero del oponente:")
-            imprimir_tablero(tablero_maquina)
+            tablero_maquina.imprimir_tablero()
             time.sleep(1)   # Para que tenga timing
             valores_jugador = input("Introduce la coordenada con el formato letra mayúscula seguida de número (ej: C9):")
             try:
@@ -89,7 +89,7 @@ while not tablero_maquina.flota_hundida() or tablero_jugador.flota_hundida():
                     print(str(error) + ", por favor vuelve a intentarlo.")
         
         try:
-            resultado_disparo = disparo(tablero_maquina, coordenada_jugador)    # Devuelve True si acierta
+            resultado_disparo = tablero_maquina.disparo(coordenada_jugador)    # Devuelve True si acierta
             turno_jugador = resultado_disparo   # Si el jugador acierta le vuelve a tocar
             if resultado_disparo:
                 print("¡Has acertado! Puedes volver a disparar")
@@ -111,7 +111,7 @@ while not tablero_maquina.flota_hundida() or tablero_jugador.flota_hundida():
             continue    # Para que no sea súper fácil ganar a la máquina, que no dispare dos veces al mismo agua
 
         try:
-            resultado_disparo = disparo(tablero_jugador, coordenada_maquina)
+            resultado_disparo = tablero_jugador.disparo(coordenada_maquina)
             turno_maquina = resultado_disparo
 
             if resultado_disparo:
@@ -122,7 +122,7 @@ while not tablero_maquina.flota_hundida() or tablero_jugador.flota_hundida():
         except:
             pass   # No hace falta para la máquina     
     print("Este es tu tablero tras el turno del oponente:")
-    imprimir_tablero(tablero_jugador, completo=True)
+    tablero_jugador.imprimir_tablero(completo=True)
 
     time.sleep(1)   # Para que de tiempo a leer
 
@@ -132,10 +132,11 @@ if tablero_jugador.flota_hundida:   # Si gana la máquina
 
 elif tablero_maquina.flota_hundida: # Si gana el jugador
     print("¡Enhorabuena! Has ganado el juego pero, ¿podrás ganar otro?")
-
+    
+time.sleep(1)
 # Para terminar el juego, imprimir todos los tableros 
 print("\nEstos son los tableros al final del juego: ")
 print("TABLERO DEL OPONENTE")
-imprimir_tablero(tablero_maquina, completo=True)
+tablero_maquina.imprimir_tablero(completo=True)
 print("\nTABLERO DEL JUGADOR")
-imprimir_tablero(tablero_jugador, completo=True)
+tablero_jugador.imprimir_tablero(completo=True)
