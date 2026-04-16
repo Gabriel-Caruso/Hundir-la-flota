@@ -3,13 +3,6 @@ import numpy as np
 import pandas as pd
 import string as st
 
-"""
-Puedo hacer que colocar barco pille args para barcos, posiciones y orientaciones
-para crear el trablero de la máquina mas fácil.
-
-Por ahora, como los barcos del jugador se colocarán uno a uno, no hace falta.
-
-"""
 def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientacion : str):
     orientaciones = ["N", "S", "E", "O"]
 
@@ -75,11 +68,11 @@ def imprimir_tablero(tablero : Tablero, completo = False):
                     mapa_tablero[i,j] = "X"
                 elif completo:                  # sólo si queremos imprimir el trablero completo se añaden los abrcos sin tocar
                     mapa_tablero[i,j] = "O"
-                else:
-                    mapa_tablero[i,j] = "0"       # La copia de tablero tendria el barco en esa posicion, hay que quitarla
+            else:
+                mapa_tablero[i,j] = "·"       # La copia de tablero tendria el barco en esa posicion, hay que quitarla
                     
     columnas_tablero = [orden_alfabetico(i) for i in range(tablero.lado)]
-    df_tablero = pd.DataFrame(mapa_tablero, columns=columnas_tablero)
+    df_tablero = pd.DataFrame(mapa_tablero, columns=columnas_tablero, index=list(range(1, tablero.lado + 1)))
     print(df_tablero)
     return      # return None porque solo es imprimir
 
@@ -127,8 +120,8 @@ def orden_alfabetico(numero):
     return correspondencia
 
 def traducir_coordenada (entrada : str):     # string de entrada es una secuencia letra-numero
-    string_desglosado = (entrada.strip()).split(",")
+    string_desglosado = entrada.strip()   # quitar posibles espaciones y separar valores
     numero = int(string_desglosado[1])
     letra = (string_desglosado[0]).upper()      # por si ha puesto minuscula
-    numero_letra = ord(letra) - 64
-    return (numero, letra)
+    numero_letra = ord(letra) - 65      # 0 -> A
+    return (numero - 1 , numero_letra)  # numero + 1 para compensar que le dataframe printea desde el 1
