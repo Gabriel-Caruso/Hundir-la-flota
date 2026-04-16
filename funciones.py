@@ -1,5 +1,7 @@
 from clases import Barco, Tablero
 import numpy as np
+import pandas as pd
+import string as st
 
 """
 Puedo hacer que colocar barco pille args para barcos, posiciones y orientaciones
@@ -21,11 +23,11 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
         if orientacion in "NS": # Para los barcos Norte y Sur, se comprueban las condiciones verticales (i)
             if orientacion == "N":
                 posicion_colocar = (posicion[0] - barco.eslora + 1, posicion[1])
-                fila, columna = posicion_colocar        # para entender mejor el código
                 # transformar el barco hacia el norte en uno hacia el sur
             else:
                 posicion_colocar = posicion    # el barco hacia el sur
             
+            fila, columna = posicion_colocar        # para entender mejor el código
             # el barco tiene que caber en el tablero desde su posición  
             if (len(tablero.tablero[fila:, columna]) < barco.eslora) or (columna not in range(tablero.lado)) or \
                     (any(tablero.tablero[fila : fila + barco.eslora, columna])):   # comprueba si hay un barco obstruyendo
@@ -42,11 +44,11 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
         if orientacion in "EO": # Para los barcos Este y Oeste, se comprueban las condiciones horizontales (j)
             if orientacion == "O":
                 posicion_colocar = (posicion[0], posicion[1] - barco.eslora + 1)
-                fila, columna = posicion_colocar        # para entender mejor el código
                 # transformar el barco hacia el norte en uno hacia el este
             else:
                 posicion_colocar = posicion    # el barco hacia el este
-
+            
+            fila, columna = posicion_colocar        # para entender mejor el código
             # el barco tiene que caber en el tablero desde su posición
             if (len(tablero.tablero[fila, columna:]) < barco.eslora) or (fila not in range (tablero.lado)) or \
                   (any(tablero.tablero[fila, columna:columna + barco.eslora])): # comprueba si hay un barco obstruyendo
@@ -59,7 +61,7 @@ def colocar_barco (tablero : Tablero, barco : Barco, posicion : tuple, orientaci
 
                 tablero.barcos.append(barco) # guardar el barco en el tablero
 
-    return tablero
+    return  # no tiene que devolver nada
 
 
 def imprimir_tablero(tablero : Tablero, completo = False):
@@ -74,8 +76,11 @@ def imprimir_tablero(tablero : Tablero, completo = False):
                 elif completo:                  # sólo si queremos imprimir el trablero completo se añaden los abrcos sin tocar
                     mapa_tablero[i,j] = "O"
                 else:
-                    mapa_tablero[i,j] = 0       # La copia de tablero tendria el barco en esa posicion, hay que quitarla
-    print(mapa_tablero)
+                    mapa_tablero[i,j] = "0"       # La copia de tablero tendria el barco en esa posicion, hay que quitarla
+                    
+    columnas_tablero = [orden_alfabetico(i) for i in range(tablero.lado)]
+    df_tablero = pd.DataFrame(mapa_tablero, columns=columnas_tablero)
+    print(df_tablero)
     return      # return None porque solo es imprimir
 
 
@@ -109,3 +114,21 @@ def disparo (tablero : Tablero, coordenada : tuple):
         print("¡Has ganado! Has hundido toda la flota del enemigo: " + tablero.id_jugador)
 
     return acertado
+
+def orden_alfabetico(numero):
+    abecedario = st.ascii_uppercase
+    correspondencia = ""
+    cociente = numero // (len(abecedario) - 1)      # si A -> 0, Z -> len(ABC)-1
+    modulo = numero % (len(abecedario) - 1)
+    
+    if cociente > 1:
+        correspondencia += abecedario[cociente]
+    correspondencia += abecedario[modulo]   # 0 -> A
+    return correspondencia
+
+def traducir_coordenada (entrada : str):     # string de entrada es una secuencia letra-numero
+    string_desglosado = (entrada.strip()).split(",")
+    numero = int(string_desglosado[1])
+    letra = (string_desglosado[0]).upper()      # por si ha puesto minuscula
+    numero_letra = ord(letra) - 64
+    return (numero, letra)
