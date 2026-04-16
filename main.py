@@ -1,5 +1,5 @@
 import numpy as np
-from variables import LADO, BARCOS
+from variables import LADO, BARCOS, ORIENTACIONES
 from clases import Barco, Tablero
 from funciones import imprimir_tablero, disparo, colocar_barco
 """
@@ -9,7 +9,7 @@ imput del jugador sea LetraNumero y no num, num
 """
 
 ######!!!!!!!!!!!!!
-orientaciones = ["N", "S", "E", "O"]
+ORIENTACIONES = ["N", "S", "E", "O"]
 ######
 
 print("Bienvenido a Hundir la Flota, ¿preparado para jugar?")
@@ -21,7 +21,7 @@ tablero_máquina= Tablero("Máquina", LADO)
 # COLOCAR BARCOS DEL JUGADOR
 for info_barco in BARCOS:       # todos los jugadores tienen los mismos barcos
     barco_jugador = Barco(info_barco)       # info_barco[0], info_barco[1] es una tupla
-    orientacion_jugador = orientaciones[int(np.randint(4))]
+    orientacion_jugador = ORIENTACIONES[int(np.randint(4))]
     barco_colocado = False
     while not barco_colocado:
 
@@ -57,7 +57,7 @@ print("El oponente está colocando sus barcos...")
 # COLOCAR BARCOS DE LA MÁQUINA
 for info_barco in BARCOS:       # todos los jugadores tienen los mismos barcos
     barco_maquina = Barco(info_barco)       # info_barco[0], info_barco[1] es una tupla
-    orientacion_maquina = orientaciones[int(np.randint(4))]
+    orientacion_maquina = ORIENTACIONES[int(np.randint(4))]
     barco_colocado = False
 
     while not barco_colocado:
