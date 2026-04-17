@@ -94,6 +94,9 @@ while not tablero_maquina.flota_hundida() or tablero_jugador.flota_hundida():
             if resultado_disparo:
                 print("¡Has acertado! Puedes volver a disparar")
                 time.sleep(1)   # Para que se pueda leer todo
+                
+                if tablero_maquina.flota_hundida():
+                    turno_jugador = False       # si el jugador gana, no hay más turnos
             else:
                 turno_maquina = True    # Si falla le toca a la máquina
                 if not tablero_maquina.flota_hundida():     # Que no diga que es el turno del oponente si gana el jugador
